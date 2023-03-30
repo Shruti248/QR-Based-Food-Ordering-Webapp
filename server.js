@@ -18,19 +18,29 @@ mongoose.connect(process.env.MONGO_CONNECTION_URL, {
   useCreateIndex: true,
   useUnifiedTopology: true,
   useFindAndModify: true,
+  bufferMaxEntries: 0, // Set to 0 to disable buffering
+  // bufferCommands: false, // Disable buffering of commands
+  autoIndex: false, // Disable automatic index creation
 });
-const connection = mongoose.connection;
-connection
-  .once("open", () => {
-    console.log("Database connected...");
-  })
-  .catch((err) => {
-    console.log("Connection failed...");
-  });
+// const connection = mongoose.connection;
+// connection
+//   .once("open", () => {
+//     console.log("Database connected...");
+//   })
+//   .catch((err) => {
+//     console.log("Connection failed...");
+//   });
+
+const db = mongoose.connection;
+db.on("error", console.error.bind(console, "connection error:"));
+db.once("open", function () {
+  console.log("Database connected...");
+});
 
 // Session store
 let mongoStore = new MongoDbStore({
-  mongooseConnection: connection,
+  // mongooseConnection: connection,
+  mongooseConnection: db,
   collection: "sessions",
 });
 
